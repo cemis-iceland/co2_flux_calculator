@@ -77,14 +77,15 @@ CO2M <- function(inputDir,first_m,d,h,vadd,span){
       #define variables 
       d  <- d                  #diameter chamber [cm]
       h  <- h                  #height chamber [cm]
-      vc  <- (pi*(d/2)^2*h)/ 10^6    #Volume [m^3]: area[cm^2](pi*diameter/4^2)*height[cm]*10^-6
-      v2 <- 22.4*10^-3          #molar volume for ideal gas at 273 K [m^3/mol]
       vadd <- vadd              #additional volume through collar etc [m^3]
-      v <- vc+vadd              #total volume [m^3]
       T1 <- T_mean +273.15 #average air temperature in relevant time window [K]
+      m  <- lm_slope           #delta C/delta t [ppm/s]
+      
+      vc  <- (pi*(d/2)^2*h)/ 10^6    #Volume [m^3]: area[cm^2](pi*diameter/4^2)*height[cm]*10^-6
+      v <- vc+vadd              #total volume [m^3]
+      v2 <- 22.4*10^-3          #molar volume for ideal gas at 273 K [m^3/mol]
       T2 <- 273.15              #standard temperature [K]
       A  <- pi*(d/2)^2* 10^-4       #footprint area chamber [m^2]
-      m  <- lm_slope           #delta C/delta t [ppm/s]
       
       #calculation flux rate
       fluxmol=m*10^-6*(v/(v2*(T2/T1)))*1/A #soil CO2 flux [mol/(m^2*s)]
