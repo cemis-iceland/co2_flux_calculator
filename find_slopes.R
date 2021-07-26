@@ -1,8 +1,7 @@
-source("local_min_max.R")
 library(pastecs)
-library(dplyr)
+library(signal)
 library(robustbase)
-
+library(dplyr)
 
 
 find_slopes_periodic <- function(xs, ys, min_span=6){
@@ -11,8 +10,6 @@ find_slopes_periodic <- function(xs, ys, min_span=6){
   # Smooth the data and find minima and maxima
   smoothed = filtfilt(butter(4, 0.3, "low"), ys - mean(ys)) # Complete guess
   extrema = turnpoints(smoothed)
-  plot(smoothed)
-  
   
   # Split the list into sections starting with minima and ending with maxima
   if (extrema$firstispeak) { # Drop first if it's a maximum
@@ -33,7 +30,7 @@ find_slopes_periodic <- function(xs, ys, min_span=6){
     }))
   
   # Exclude short spans to eliminate noise
-  spans <- filter(spans, len > min_span)
+  spans <- dplyr::filter(spans, len > min_span)
   
   # For each span, find the slope
   slopes <- spans %>% apply(1, function(row){
@@ -43,10 +40,10 @@ find_slopes_periodic <- function(xs, ys, min_span=6){
     range = max(span$y) - min(span$y)
     lower = min(span$y) + 0.10 * range # These percentages can be adjusted to 
     upper = max(span$y) - 0.00 * range # change how much data is discarded
-    span <- span %>% filter(y > lower) %>% filter(y < upper)
+    span <- span %>% dplyr::filter(y > lower) %>% dplyr::filter(y < upper)
     
     # Then simply perform a robust linear regression to find the slope of best fit
-    fit = lmrob(y ~ x, span, method="KS2014")
+    fit = lm(y ~ x, span)
     return(list(
       start=row["start"], 
       end=row["end"],
